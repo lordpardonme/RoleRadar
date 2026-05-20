@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
-    "@job-fit-hunter/shared": "workspace:*",
+    "@job-fit-hunter/shared": "0.1.0",
     "@prisma/client": "^6.19.0",
     "dotenv": "^17.2.3",
     "fastify": "^5.6.2",

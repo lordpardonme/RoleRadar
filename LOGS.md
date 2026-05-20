@@ -7,4 +7,6 @@
 - Added shared unit tests covering resume parsing, personality scoring, weighted job scoring, verified contact extraction, and file-upload autofill guardrails.
 - Added `apps/api` Fastify service with profile storage endpoints, personality/culture/job/form/email endpoints, HTTPS production guard, encrypted profile repository, Prisma schema, and route test.
 - Added `BRAIN.md` as durable project memory and this log file as implementation ledger.
-- GitHub repo creation requested. Local shell has no `gh` command and no remote configured; next step is connector/CLI path check or install.
+- GitHub repo creation requested. Local shell had no `gh` command and no remote configured; GitHub CLI install attempts timed out.
+- User provided `git@github.com:lordpardonme/RoleRadar.git`; added as `origin` and pushed baseline commit `a319ea8` to `origin/master`.
+- Added Chrome MV3 extension scaffold with manifest, service worker, content runtime, active-tab scanning, form extraction, reviewed autofill application, and React side-panel UI for onboarding, scoring, autofill preview, outreach draft, export, delete, and hidden-company controls.

@@ -1,0 +1,503 @@
+:root {
+  color-scheme: light;
+  --ink: #12130f;
+  --muted: #676b5f;
+  --paper: #f7f5ed;
+  --panel: #fffdf5;
+  --line: #d7d2c2;
+  --teal: #0f766e;
+  --teal-dark: #0b4f4a;
+  --red: #c2412d;
+  --gold: #b7791f;
+  --blue: #2855a7;
+  --shadow: 0 16px 44px rgba(34, 30, 20, 0.12);
+  font-family: "Bahnschrift", "Aptos", "Segoe UI Variable", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 360px;
+  background:
+    linear-gradient(90deg, rgba(18, 19, 15, 0.04) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(18, 19, 15, 0.04) 1px, transparent 1px),
+    var(--paper);
+  background-size: 18px 18px;
+  color: var(--ink);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.shell {
+  min-height: 100vh;
+  padding: 14px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 10px;
+  z-index: 10;
+}
+
+.brandRow,
+.topActions,
+.buttonRow,
+.sectionHeader,
+.previewHead,
+.metric {
+  display: flex;
+  align-items: center;
+}
+
+.brandRow {
+  gap: 8px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 20px;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.topbar p,
+.muted,
+small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.topActions {
+  gap: 7px;
+}
+
+.iconButton,
+.button {
+  border: 1px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 7px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.iconButton {
+  width: 36px;
+}
+
+.button {
+  padding: 0 12px;
+  font-weight: 700;
+}
+
+.button:hover,
+.iconButton:hover {
+  transform: translateY(-1px);
+}
+
+.primary {
+  background: var(--teal);
+  color: #fff;
+}
+
+.danger {
+  color: var(--red);
+}
+
+.notice {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 10px;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  background: #fff7db;
+  color: #684600;
+  font-size: 12px;
+}
+
+.panelStack,
+.workbench {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.sectionHeader {
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.sectionHeader h2,
+.detail h2,
+.preview h2 {
+  font-size: 16px;
+}
+
+.consent,
+.fieldBlock,
+.fold,
+.detail,
+.preview,
+.emptyState,
+.scoreStrip,
+.jobList {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 245, 0.94);
+}
+
+.consent {
+  display: flex;
+  gap: 9px;
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.consent.slim {
+  border-style: dashed;
+}
+
+.fieldBlock {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+}
+
+.fieldBlock span,
+.fold summary,
+.rangeRow span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  padding: 9px;
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.fold {
+  padding: 0;
+  overflow: hidden;
+}
+
+.fold summary {
+  list-style: none;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.questionGrid,
+.valueGrid {
+  display: grid;
+  gap: 8px;
+  padding: 0 10px 10px;
+}
+
+.rangeRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  align-items: center;
+  gap: 8px;
+}
+
+.rangeRow.compact {
+  grid-template-columns: 88px minmax(0, 1fr) 30px;
+}
+
+.rangeRow input {
+  padding: 0;
+  accent-color: var(--teal);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.sticky {
+  position: sticky;
+  bottom: 10px;
+  padding: 10px;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.buttonRow {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scoreStrip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.metric {
+  gap: 6px;
+  justify-content: space-between;
+  padding: 10px;
+  background: var(--panel);
+}
+
+.metric span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.metric b {
+  font-size: 18px;
+}
+
+.jobList {
+  display: grid;
+  gap: 1px;
+  padding: 1px;
+  background: var(--line);
+}
+
+.jobItem {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  border: 0;
+  background: var(--panel);
+  text-align: left;
+  padding: 10px;
+}
+
+.jobItem.active {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+
+.jobItem b,
+.jobItem small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scoreBubble {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: #fff;
+  background: var(--blue);
+}
+
+.emptyState {
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  align-content: center;
+}
+
+.detail,
+.preview {
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.detailHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detailHeader strong {
+  font-size: 34px;
+  line-height: 1;
+  color: var(--teal-dark);
+}
+
+.detailHeader p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.breakdown {
+  display: grid;
+  gap: 7px;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr) 30px;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.barRow div {
+  height: 8px;
+  background: #e8e1cc;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.barRow i {
+  display: block;
+  height: 100%;
+  background: var(--teal);
+}
+
+.nextAction {
+  border-left: 4px solid var(--teal);
+  padding: 8px;
+  background: #eef8f3;
+  font-size: 13px;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.evidence {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.evidence h3 {
+  font-size: 12px;
+}
+
+.evidence p,
+.warnText {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.cultureLine {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cultureLine span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-size: 11px;
+  background: #fff;
+  color: var(--teal-dark);
+}
+
+.previewHead {
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.compactButton {
+  height: 30px;
+  font-size: 12px;
+}
+
+.previewRow {
+  display: grid;
+  grid-template-columns: 95px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.previewRow b {
+  font-size: 12px;
+}
+
+code,
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 11px;
+  color: var(--teal-dark);
+}
+
+pre {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px;
+  line-height: 1.45;
+}
+
+.warnText {
+  color: var(--red);
+}
+
+.footerRow {
+  justify-content: flex-end;
+  padding-bottom: 10px;
+}
