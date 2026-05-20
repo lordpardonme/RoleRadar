@@ -2,7 +2,7 @@
 
 ## Product
 
-Job Fit Hunter is a personal Chrome MV3 extension plus API. It helps a candidate scan job/career pages, compare roles against resume, preferences, Big Five traits, and work values, then preview autofill and draft outreach.
+RoleRadar is a personal Chrome MV3 extension plus API. It helps a candidate scan job/career pages, compare roles against resume, preferences, Big Five traits, and work values, then preview autofill and draft outreach.
 
 ## Non-Negotiables
 
@@ -19,6 +19,7 @@ Job Fit Hunter is a personal Chrome MV3 extension plus API. It helps a candidate
 - `packages/shared`: Pure domain logic and types.
 - `apps/api`: Fastify API, Prisma/Postgres-ready encrypted profile storage, dev memory fallback.
 - `apps/extension`: React side panel, MV3 background worker, active-tab content extraction.
+- `.github/workflows/ci.yml`: GitHub verification for install, Prisma generation, typecheck, tests, and build.
 
 ## Score Model
 

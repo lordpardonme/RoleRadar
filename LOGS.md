@@ -26,3 +26,5 @@
 - Fixed linked-job text extraction so adjacent title/location elements do not merge and hide location signals.
 - Tightened culture URL extraction so job links are not misclassified as culture pages.
 - Verified with `npm run typecheck`, `npm test`, and `npm run build`.
+- Added GitHub Actions CI for install, Prisma generation, typecheck, tests, and build on `master` pushes and pull requests.
+- Updated docs/brain to use the RoleRadar name consistently.

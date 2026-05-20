@@ -1,4 +1,4 @@
-# Job Fit Hunter
+# RoleRadar
 
 Personal MVP Chrome MV3 extension + API for job fit scoring, application autofill preview, and outreach drafting.
 
@@ -19,6 +19,25 @@ npm run dev:api
 ```
 
 Load `apps/extension/dist` as an unpacked extension after `npm run build:extension`.
+
+## Local Development
+
+```powershell
+npm run dev:api
+npm run dev:extension
+```
+
+Open `http://127.0.0.1:5173` for a preview shell, or load `apps/extension/dist` in Chrome for real active-tab scanning.
+
+## GitHub Checks
+
+CI runs on pushes and pull requests:
+
+- `npm ci`
+- `npm run prisma:generate`
+- `npm run typecheck`
+- `npm test`
+- `npm run build`
 
 ## Privacy Guardrails
 
