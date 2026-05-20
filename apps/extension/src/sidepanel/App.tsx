@@ -82,6 +82,7 @@ export function App() {
   const [selectedJobId, setSelectedJobId] = useState<string>();
   const [fields, setFields] = useState<FormFieldDescriptor[]>([]);
   const [autofillPlan, setAutofillPlan] = useState<AutofillPlan>();
+  const [autofillSelections, setAutofillSelections] = useState<Record<string, boolean>>({});
   const [emailDraft, setEmailDraft] = useState<EmailDraft>();
   const [hiddenCompanies, setHiddenCompanies] = useState<string[]>([]);
 
@@ -119,6 +120,7 @@ export function App() {
     setStatus("Scanning active tab");
     setWarning(undefined);
     setAutofillPlan(undefined);
+    setAutofillSelections({});
     setEmailDraft(undefined);
     setFields([]);
 
@@ -148,13 +150,22 @@ export function App() {
     setFields(extracted);
     const plan = await mapForm(settings, profile, selected.job, extracted, profileId);
     setAutofillPlan(plan);
+    setAutofillSelections(Object.fromEntries(plan.fields.map((field) => [field.selector, !field.requiresUserAction])));
     setStatus(`${plan.fields.length} autofill fields ready`);
   }
 
   async function handleApplyAutofill() {
     if (!autofillPlan) return;
+    const reviewedPlan = {
+      ...autofillPlan,
+      fields: autofillPlan.fields.filter((field) => autofillSelections[field.selector] && !field.requiresUserAction)
+    };
+    if (!reviewedPlan.fields.length) {
+      setWarning("No reviewed autofill fields selected.");
+      return;
+    }
     setStatus("Applying reviewed fields");
-    const result = await sendRuntime<{ applied: number; skipped: string[] }>({ type: "APPLY_AUTOFILL", plan: autofillPlan });
+    const result = await sendRuntime<{ applied: number; skipped: string[] }>({ type: "APPLY_AUTOFILL", plan: reviewedPlan });
     setStatus(`${result.applied} fields filled`);
     if (result.skipped.length) setWarning(result.skipped.join(" | "));
   }
@@ -237,11 +248,13 @@ export function App() {
           selected={selected}
           fields={fields}
           autofillPlan={autofillPlan}
+          autofillSelections={autofillSelections}
           emailDraft={emailDraft}
           onScan={handleScan}
           onSelect={setSelectedJobId}
           onPreviewAutofill={handleAutofillPreview}
           onApplyAutofill={handleApplyAutofill}
+          onToggleAutofillField={(selector, selected) => setAutofillSelections((current) => ({ ...current, [selector]: selected }))}
           onDraftEmail={handleDraftEmail}
           onHideCompany={handleHideCompany}
           onExport={handleExport}
@@ -424,11 +437,13 @@ function Workbench(props: {
   selected: RankedJob | undefined;
   fields: FormFieldDescriptor[];
   autofillPlan: AutofillPlan | undefined;
+  autofillSelections: Record<string, boolean>;
   emailDraft: EmailDraft | undefined;
   onScan: () => void;
   onSelect: (id: string) => void;
   onPreviewAutofill: () => void | Promise<void>;
   onApplyAutofill: () => void | Promise<void>;
+  onToggleAutofillField: (selector: string, selected: boolean) => void;
   onDraftEmail: () => void | Promise<void>;
   onHideCompany: (company?: string) => void | Promise<void>;
   onExport: () => void;
@@ -524,7 +539,15 @@ function Workbench(props: {
         <Preview title="Autofill Preview" action="Apply Reviewed Fields" onAction={props.onApplyAutofill}>
           {props.autofillPlan.fields.map((field) => (
             <div key={field.selector} className="previewRow">
-              <b>{field.label}</b>
+              <label className="reviewChoice">
+                <input
+                  type="checkbox"
+                  checked={Boolean(props.autofillSelections[field.selector])}
+                  disabled={Boolean(field.requiresUserAction)}
+                  onChange={(event) => props.onToggleAutofillField(field.selector, event.target.checked)}
+                />
+                <b>{field.label}</b>
+              </label>
               <code>{field.requiresUserAction ? "manual" : field.value}</code>
             </div>
           ))}

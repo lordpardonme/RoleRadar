@@ -28,3 +28,4 @@
 - Verified with `npm run typecheck`, `npm test`, and `npm run build`.
 - Added GitHub Actions CI for install, Prisma generation, typecheck, tests, and build on `master` pushes and pull requests.
 - Updated docs/brain to use the RoleRadar name consistently.
+- Added per-field autofill review checkboxes so users can exclude individual fields before applying reviewed autofill.

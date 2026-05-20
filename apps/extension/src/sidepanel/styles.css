@@ -475,6 +475,20 @@ textarea {
   font-size: 12px;
 }
 
+.reviewChoice {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.reviewChoice input {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  accent-color: var(--teal);
+}
+
 code,
 pre {
   white-space: pre-wrap;
