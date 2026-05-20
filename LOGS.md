@@ -18,3 +18,11 @@
 - Verified with `npm run typecheck`, `npm test`, and `npm run build`.
 - Browser smoke checked Vite side-panel preview: onboarding save, demo scan, score display, autofill preview, manual resume warning, verified email draft.
 - Started local dev servers for extension preview (`http://127.0.0.1:5173`) and API (`http://127.0.0.1:8787/health`).
+
+## 2026-05-21
+
+- Extracted RoleRadar content scraping into testable pure DOM helpers.
+- Added extension fixture tests for JSON-LD job postings, Lever/Ashby/Workday/generic career lists, current-page job fallback, form extraction, and safe autofill behavior.
+- Fixed linked-job text extraction so adjacent title/location elements do not merge and hide location signals.
+- Tightened culture URL extraction so job links are not misclassified as culture pages.
+- Verified with `npm run typecheck`, `npm test`, and `npm run build`.
