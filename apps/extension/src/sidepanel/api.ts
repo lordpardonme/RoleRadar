@@ -40,6 +40,10 @@ export async function scorePersonalityViaApi(
 }
 
 export async function saveProfile(profile: UserProfile, settings: ApiSettings): Promise<{ profileId?: string; warning?: string }> {
+  if (!canUseExtensionApi()) {
+    return { warning: "Preview mode. Profile kept for current browser session only." };
+  }
+
   try {
     const response = await post<{ profileId: string }>(settings, "/v1/profile", profile);
     return { profileId: response.profileId };
@@ -63,6 +67,10 @@ export async function scoreJobFit(
   culture?: CompanyCultureProfile,
   profileId?: string
 ): Promise<JobMatch> {
+  if (!canUseExtensionApi()) {
+    return scoreJob(profile, job, culture);
+  }
+
   try {
     return await post<JobMatch>(settings, "/v1/jobs/score", {
       ...(profileId ? { profileId } : { profile }),
@@ -81,6 +89,10 @@ export async function mapForm(
   fields: FormFieldDescriptor[],
   profileId?: string
 ): Promise<AutofillPlan> {
+  if (!canUseExtensionApi()) {
+    return buildAutofillPlan(profile, job, fields);
+  }
+
   try {
     return await post<AutofillPlan>(settings, "/v1/forms/map", {
       ...(profileId ? { profileId } : { profile }),
@@ -99,6 +111,10 @@ export async function draftEmail(
   contactEmails: ContactEmail[],
   profileId?: string
 ): Promise<EmailDraft> {
+  if (!canUseExtensionApi()) {
+    return draftOutreachEmail(profile, job, contactEmails);
+  }
+
   try {
     return await post<EmailDraft>(settings, "/v1/email/draft", {
       ...(profileId ? { profileId } : { profile }),
@@ -111,7 +127,7 @@ export async function draftEmail(
 }
 
 export async function deleteRemoteProfile(settings: ApiSettings, profileId: string): Promise<void> {
-  await fetch(`${settings.apiBaseUrl}/v1/profile/${profileId}`, { method: "DELETE" });
+  await fetchWithTimeout(`${settings.apiBaseUrl}/v1/profile/${profileId}`, { method: "DELETE" });
 }
 
 export function buildProfileFromForm(input: {
@@ -121,7 +137,7 @@ export function buildProfileFromForm(input: {
   targetRoles: string;
   targetLocations: string;
   remote: UserProfile["preferences"]["remote"];
-  minimumCompensation?: number;
+  minimumCompensation?: number | undefined;
   needsVisaSponsorship: boolean;
   dealbreakers: string;
 }): UserProfile {
@@ -146,11 +162,25 @@ function splitList(value: string): string[] {
 }
 
 async function post<T>(settings: ApiSettings, path: string, body: unknown): Promise<T> {
-  const response = await fetch(`${settings.apiBaseUrl}${path}`, {
+  const response = await fetchWithTimeout(`${settings.apiBaseUrl}${path}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body)
   });
   if (!response.ok) throw new Error(`API ${path} failed: ${response.status}`);
   return response.json() as Promise<T>;
+}
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = 2500): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function canUseExtensionApi(): boolean {
+  return typeof chrome !== "undefined" && Boolean(chrome.runtime?.id);
 }

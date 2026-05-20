@@ -253,9 +253,9 @@ export function App() {
 }
 
 function ProfilePanel(props: {
-  current?: UserProfile;
-  onSaved: (profile: UserProfile) => void;
-  onDelete: () => void;
+  current: UserProfile | undefined;
+  onSaved: (profile: UserProfile) => void | Promise<void>;
+  onDelete: () => void | Promise<void>;
   onExport: () => void;
 }) {
   const [resumeText, setResumeText] = useState(props.current?.resumeText ?? SAMPLE_RESUME);
@@ -418,21 +418,21 @@ function ProfilePanel(props: {
 
 function Workbench(props: {
   profile: UserProfile;
-  scan?: PageScan;
-  culture?: CompanyCultureProfile;
+  scan: PageScan | undefined;
+  culture: CompanyCultureProfile | undefined;
   rankedJobs: RankedJob[];
-  selected?: RankedJob;
+  selected: RankedJob | undefined;
   fields: FormFieldDescriptor[];
-  autofillPlan?: AutofillPlan;
-  emailDraft?: EmailDraft;
+  autofillPlan: AutofillPlan | undefined;
+  emailDraft: EmailDraft | undefined;
   onScan: () => void;
   onSelect: (id: string) => void;
-  onPreviewAutofill: () => void;
-  onApplyAutofill: () => void;
-  onDraftEmail: () => void;
-  onHideCompany: (company?: string) => void;
+  onPreviewAutofill: () => void | Promise<void>;
+  onApplyAutofill: () => void | Promise<void>;
+  onDraftEmail: () => void | Promise<void>;
+  onHideCompany: (company?: string) => void | Promise<void>;
   onExport: () => void;
-  onDelete: () => void;
+  onDelete: () => void | Promise<void>;
 }) {
   return (
     <section className="workbench">
@@ -597,7 +597,51 @@ function Preview(props: { title: string; action: string; onAction: () => void; c
 }
 
 async function sendRuntime<T>(message: unknown): Promise<T> {
+  if (typeof chrome === "undefined" || !chrome.runtime?.sendMessage) {
+    return devRuntime<T>(message);
+  }
+
   const response = await chrome.runtime.sendMessage(message) as RuntimeResponse<T>;
   if (!response.ok) throw new Error(response.error ?? "Extension runtime failed.");
   return response.data as T;
+}
+
+function devRuntime<T>(message: unknown): T {
+  const typed = message as { type?: string; plan?: AutofillPlan };
+  if (typed.type === "SCAN_PAGE") {
+    return {
+      pageUrl: "http://127.0.0.1:5173/demo-job",
+      pageTitle: "Demo Senior Frontend Engineer",
+      pageText: "Senior Frontend Engineer role. Build React, TypeScript, Node.js and Postgres products. Remote team with autonomy, collaboration, learning, mission impact, and flexible work.",
+      cultureUrls: ["https://example.com/culture"],
+      contacts: {
+        emails: [{ email: "careers@example.com", source: "page-text", verified: true }]
+      },
+      jobs: [{
+        id: "demo_job",
+        sourceUrl: "http://127.0.0.1:5173/demo-job",
+        title: "Senior Frontend Engineer",
+        company: "Example Labs",
+        location: "Remote",
+        description: "Build React, TypeScript, Node.js and Postgres products. 5 years experience. Remote culture with autonomy, collaboration, learning, mission impact, and flexible work.",
+        applyUrl: "http://127.0.0.1:5173/demo-job",
+        cultureUrls: ["https://example.com/culture"],
+        extractedAt: new Date().toISOString()
+      }]
+    } as T;
+  }
+
+  if (typed.type === "EXTRACT_FORMS") {
+    return [
+      { selector: "#firstName", label: "First Name", type: "text", required: true },
+      { selector: "#email", label: "Email", type: "email", required: true },
+      { selector: "#resume", label: "Resume", type: "file", required: true }
+    ] as T;
+  }
+
+  if (typed.type === "APPLY_AUTOFILL") {
+    return { applied: 0, skipped: ["Dev preview only. Load unpacked extension to fill live forms."] } as T;
+  }
+
+  throw new Error("Unsupported dev runtime message.");
 }

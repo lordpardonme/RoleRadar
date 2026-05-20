@@ -64,16 +64,20 @@ function extractJsonLdJobs(cultureUrls: string[]): JobPosting[] {
         .forEach((node) => {
           const title = textFrom(node.title);
           const description = stripHtml(textFrom(node.description));
+          const company = textFrom(node.hiringOrganization?.name);
+          const locationText = locationFrom(node.jobLocation);
+          const employmentType = textFrom(node.employmentType);
+          const salaryText = textFrom(node.baseSalary?.value?.value);
           if (!title || !description) return;
           jobs.push({
             id: stableId(`${location.href}:${title}`),
             sourceUrl: location.href,
             title,
-            ...(textFrom(node.hiringOrganization?.name) ? { company: textFrom(node.hiringOrganization.name) } : {}),
-            ...(locationFrom(node.jobLocation) ? { location: locationFrom(node.jobLocation) } : {}),
+            ...(company ? { company } : {}),
+            ...(locationText ? { location: locationText } : {}),
             description,
-            ...(textFrom(node.employmentType) ? { employmentType: textFrom(node.employmentType) } : {}),
-            ...(textFrom(node.baseSalary?.value?.value) ? { salaryText: textFrom(node.baseSalary.value.value) } : {}),
+            ...(employmentType ? { employmentType } : {}),
+            ...(salaryText ? { salaryText } : {}),
             applyUrl: location.href,
             cultureUrls,
             extractedAt: new Date().toISOString()
@@ -109,12 +113,14 @@ function extractLinkedJobs(cultureUrls: string[]): JobPosting[] {
   return dedupeJobs(candidates.slice(0, 30).map((anchor) => {
     const card = anchor.closest("li, article, section, div");
     const description = normalize((card as HTMLElement | null)?.innerText ?? anchor.innerText);
+    const company = guessCompany();
+    const locationText = guessLocation(description);
     return {
       id: stableId(anchor.href),
       sourceUrl: location.href,
       title: normalize(anchor.innerText),
-      ...(guessCompany() ? { company: guessCompany() } : {}),
-      ...(guessLocation(description) ? { location: guessLocation(description) } : {}),
+      ...(company ? { company } : {}),
+      ...(locationText ? { location: locationText } : {}),
       description: description || normalize(document.body?.innerText ?? "").slice(0, 1200),
       applyUrl: anchor.href,
       cultureUrls,
@@ -128,12 +134,14 @@ function extractCurrentPageJob(pageText: string, cultureUrls: string[]): JobPost
   if (!title) return undefined;
   const looksLikeJob = /responsibilities|requirements|qualifications|apply|experience|salary|benefits/i.test(pageText);
   if (!looksLikeJob) return undefined;
+  const company = guessCompany();
+  const locationText = guessLocation(pageText);
   return {
     id: stableId(location.href),
     sourceUrl: location.href,
     title,
-    ...(guessCompany() ? { company: guessCompany() } : {}),
-    ...(guessLocation(pageText) ? { location: guessLocation(pageText) } : {}),
+    ...(company ? { company } : {}),
+    ...(locationText ? { location: locationText } : {}),
     description: pageText.slice(0, 12000),
     applyUrl: location.href,
     cultureUrls,
@@ -158,14 +166,17 @@ function extractForms(): FormFieldDescriptor[] {
   const controls = [...document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>("input, textarea, select")];
   return controls
     .filter((control) => !["hidden", "submit", "button", "reset"].includes(control.type))
-    .map((control) => ({
-      selector: selectorFor(control),
-      label: labelFor(control),
-      ...(control.getAttribute("name") ? { name: control.getAttribute("name") ?? undefined } : {}),
-      type: control.type || control.tagName.toLowerCase(),
-      required: control.required,
-      ...(control instanceof HTMLSelectElement ? { options: [...control.options].map((option) => option.text) } : {})
-    }));
+    .map((control) => {
+      const name = control.getAttribute("name");
+      return {
+        selector: selectorFor(control),
+        label: labelFor(control),
+        ...(name ? { name } : {}),
+        type: control.type || control.tagName.toLowerCase(),
+        required: control.required,
+        ...(control instanceof HTMLSelectElement ? { options: [...control.options].map((option) => option.text) } : {})
+      };
+    });
 }
 
 function applyAutofill(plan: AutofillPlan): { applied: number; skipped: string[] } {
@@ -191,7 +202,7 @@ function setControlValue(control: HTMLInputElement | HTMLTextAreaElement | HTMLS
   if (control instanceof HTMLSelectElement) {
     const option = [...control.options].find((item) => item.text.toLowerCase().includes(value.toLowerCase()) || item.value.toLowerCase() === value.toLowerCase());
     if (option) control.value = option.value;
-  } else if (control.type === "checkbox" || control.type === "radio") {
+  } else if (control instanceof HTMLInputElement && (control.type === "checkbox" || control.type === "radio")) {
     control.checked = /yes|true|authorized|remote/i.test(value);
   } else {
     control.value = value;
@@ -213,9 +224,10 @@ function selectorFor(element: Element): string {
   const path: string[] = [];
   let current: Element | null = element;
   while (current && current !== document.body) {
-    const parent = current.parentElement;
+    const parent: Element | null = current.parentElement;
     if (!parent) break;
-    const siblings = [...parent.children].filter((child) => child.tagName === current?.tagName);
+    const tagName = current.tagName;
+    const siblings = [...parent.children].filter((child) => child.tagName === tagName);
     const index = siblings.indexOf(current) + 1;
     path.unshift(`${current.tagName.toLowerCase()}:nth-of-type(${index})`);
     current = parent;
@@ -296,5 +308,7 @@ function normalize(value: string): string {
 }
 
 function cssEscape(value: string): string {
-  return globalThis.CSS?.escape ? CSS.escape(value) : value.replace(/["\\#.:,[\]>+~*]/g, "\\$&");
+  return typeof CSS !== "undefined" && typeof CSS.escape === "function"
+    ? CSS.escape(value)
+    : value.replace(/["\\#.:,[\]>+~*]/g, "\\$&");
 }

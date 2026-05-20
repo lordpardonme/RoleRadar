@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { Prisma } from "@prisma/client";
 import type { UserProfile } from "@job-fit-hunter/shared";
 import { decryptJson, encryptJson, type EncryptedPayload } from "../security/encryption.js";
 
@@ -65,18 +66,22 @@ async function createPrismaRepository(): Promise<ProfileRepository> {
       const saved: UserProfile = { ...profile, id };
       await prisma.profile.upsert({
         where: { id },
-        create: { id, encryptedProfile: encryptJson(saved) },
-        update: { encryptedProfile: encryptJson(saved) }
+        create: { id, encryptedProfile: toJson(encryptJson(saved)) },
+        update: { encryptedProfile: toJson(encryptJson(saved)) }
       });
       return saved;
     },
     async get(id: string): Promise<UserProfile | undefined> {
       const record = await prisma.profile.findUnique({ where: { id } });
-      return record ? decryptJson<UserProfile>(record.encryptedProfile as EncryptedPayload) : undefined;
+      return record ? decryptJson<UserProfile>(record.encryptedProfile as unknown as EncryptedPayload) : undefined;
     },
     async delete(id: string): Promise<boolean> {
       await prisma.profile.delete({ where: { id } });
       return true;
     }
   };
+}
+
+function toJson(payload: EncryptedPayload): Prisma.InputJsonValue {
+  return payload as unknown as Prisma.InputJsonValue;
 }

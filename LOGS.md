@@ -10,3 +10,11 @@
 - GitHub repo creation requested. Local shell had no `gh` command and no remote configured; GitHub CLI install attempts timed out.
 - User provided `git@github.com:lordpardonme/RoleRadar.git`; added as `origin` and pushed baseline commit `a319ea8` to `origin/master`.
 - Added Chrome MV3 extension scaffold with manifest, service worker, content runtime, active-tab scanning, form extraction, reviewed autofill application, and React side-panel UI for onboarding, scoring, autofill preview, outreach draft, export, delete, and hidden-company controls.
+- Installed dependencies and generated Prisma client.
+- Fixed strict TypeScript issues in Prisma JSON storage, extension optional-property construction, form controls, and Vite config.
+- Excluded source test files from TypeScript build output so Vitest runs source tests once instead of also seeing compiled `dist` copies.
+- Browser smoke at Vite URL exposed missing Chrome storage APIs outside extension context; added memory-only dev fallback and demo runtime so side-panel UI can be previewed locally while packaged extension keeps Chrome storage/runtime behavior.
+- Added extension-context API gating and fetch timeout so local preview does not stall when backend is offline.
+- Verified with `npm run typecheck`, `npm test`, and `npm run build`.
+- Browser smoke checked Vite side-panel preview: onboarding save, demo scan, score display, autofill preview, manual resume warning, verified email draft.
+- Started local dev servers for extension preview (`http://127.0.0.1:5173`) and API (`http://127.0.0.1:8787/health`).
