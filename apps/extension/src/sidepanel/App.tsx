@@ -45,7 +45,7 @@ import {
 import { clearProfile, loadState, storeHiddenCompanies, storeProfile } from "./storage";
 import type { PageScan, RuntimeResponse } from "../messages";
 
-type View = "workbench" | "profile";
+type View = "workbench" | "profile" | "resume";
 
 interface RankedJob {
   job: JobPosting;
@@ -224,6 +224,9 @@ export function App() {
           <button className="iconButton" title="Profile" onClick={() => setView(view === "profile" ? "workbench" : "profile")}>
             <SlidersHorizontal size={17} />
           </button>
+          <button className="iconButton" title="Resume preview" onClick={() => setView(view === "resume" ? "workbench" : "resume")}>
+            <FileText size={17} />
+          </button>
           <button className="iconButton primary" title="Scan active tab" onClick={handleScan}>
             <RefreshCw size={17} />
           </button>
@@ -237,7 +240,9 @@ export function App() {
         </div>
       ) : null}
 
-      {view === "profile" || !profile ? (
+      {view === "resume" ? (
+        <ResumePreview />
+      ) : view === "profile" || !profile ? (
         <ProfilePanel current={profile} onSaved={handleProfileSaved} onDelete={handleDeleteProfile} onExport={handleExport} />
       ) : (
         <Workbench
@@ -262,6 +267,133 @@ export function App() {
         />
       )}
     </main>
+  );
+}
+
+const RESUME_JOBS = [
+  {
+    company: "I-DOD",
+    role: "Product Designer",
+    date: "July 2025 - March 2026",
+    location: "New Delhi, India",
+    bullets: [
+      "Designing end-to-end mobile app experience for relationship platform targeting Indian users, including onboarding, KYC verification, and profile creation flows.",
+      "Collaborating with founding team (5 people) to define product requirements and user journeys for dating and marriage segments.",
+      "Currently in beta testing with 500+ users, iterating based on feedback."
+    ]
+  },
+  {
+    company: "FuelBuddy",
+    role: "Product Designer",
+    date: "July 2023 - June 2024",
+    location: "Gurgaon, India",
+    bullets: [
+      "Led UX for a new consumer fuel-pick service (Arjun), designing end-to-end flows from discovery to payment; project was taken to high-fidelity prototype but put on hold before launch.",
+      "Reworked doorstep fuel delivery experience inside the main FuelBuddy app, reducing ordering from 8 to 3 steps and increasing order completion rate from 62% to 78% (A/B test with 12,000 users over 6 weeks).",
+      "Designed the franchise web application used to manage fleets, drivers, tankers and deliveries across India and Dubai, including dashboards, order assignment, shift scheduling and Gantt-style planning views for operations teams.",
+      "Created the Wheels driver app and supporting B2B management sections, covering login, shift scheduling, live jobs, navigation, error handling and odometer/quantity correction flows, helping reduce driver support tickets by 35% (450->290 per month)."
+    ]
+  },
+  {
+    company: "Uncover by Meddo",
+    role: "Product Designer",
+    date: "March 2022 - May 2023",
+    location: "Gurgaon, India",
+    bullets: [
+      "Redesigned appointment booking flow reducing steps from 6 to 4, improving booking completion rate from 71% to 83% over 8-week period (tracked via Google Analytics).",
+      "Designed and shipped new doctor profile page increasing profile views by 28% and appointment requests by 15% (A/B tested with 5,000 users).",
+      "Conducted usability testing with 12 patients and 8 doctors to identify friction points in telemedicine experience, presenting findings to product and engineering teams.",
+      "Worked as sole designer, contributing to design system documentation and component library in Figma."
+    ]
+  },
+  {
+    company: "AcadPlaza",
+    role: "UI Designer",
+    date: "June 2020 - March 2022",
+    location: "Remote",
+    bullets: [
+      "Redesigned course catalog and search experience, increasing course enrollments by 18% quarter-over-quarter (Q3 to Q4 2021).",
+      "Created responsive UI components and a basic style guide used across web and mobile learning experiences.",
+      "Collaborated with an 8-person remote team (product, engineering, content) using Figma and Slack to ship iterative improvements."
+    ]
+  }
+];
+
+const RESUME_SKILLS = [
+  { title: "Design", items: ["Figma (Auto Layout, Variables)", "Wireframing", "Prototyping", "Interaction Design", "Responsive & Mobile-First Design"] },
+  { title: "Research & Analytics", items: ["User Interviews", "Usability Testing", "Journey Mapping", "A/B Testing", "Funnel Analysis", "Google Analytics", "Hotjar"] },
+  { title: "AI & Workflow", items: ["ChatGPT / Perplexity (research synthesis, UX writing)", "FigJam AI (ideation support)"] },
+  { title: "Tools", items: ["Figma", "Miro", "Adobe Creative Suite", "Rive", "Framer", "Claude Code"] }
+];
+
+function ResumePreview() {
+  return (
+    <section className="resumeViewport" aria-label="Figma resume implementation">
+      <article className="resumePage">
+        <header className="resumeIntro">
+          <h2>MOHD HAYAAT ALI</h2>
+          <p>Product Designer</p>
+          <p>Product Designer with 4 years of experience in mobile and web products for consumer and SaaS companies, focused on onboarding, conversion optimisation, and data-informed UX.</p>
+        </header>
+
+        <address className="resumeContact">
+          <a href="https://workofhayaat.framer.website" target="_blank" rel="noreferrer">Portfolio Link</a>
+          <span>mohdhayaat1@outlook.com</span>
+          <span>+91-7991880020</span>
+          <span>+91-7905194153</span>
+          <span>Delhi, India</span>
+        </address>
+
+        <div className="resumeDivider" />
+
+        <main className="resumeLeftColumn">
+          <section className="resumeSection">
+            <h3>Experience</h3>
+            <div className="resumeJobs">
+              {RESUME_JOBS.map((job) => (
+                <section className="resumeJob" key={job.company}>
+                  <div className="resumeJobHeading">
+                    <h4>{job.company}</h4>
+                    <span>{job.role}</span>
+                  </div>
+                  <div className="resumeMeta">
+                    <span>{job.date}</span>
+                    <span>{job.location}</span>
+                  </div>
+                  <ul>
+                    {job.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          </section>
+
+          <section className="resumeSection resumeEducation">
+            <h3>Education</h3>
+            <h4>BBA, Business Administration</h4>
+            <p><span>2017 - 2020</span><span>Sam Higginbottom University of Agriculture, Technology & Sciences</span></p>
+          </section>
+        </main>
+
+        <aside className="resumeRightColumn">
+          <h3>Skills</h3>
+          <div className="resumeSkillStack">
+            {RESUME_SKILLS.map((skill) => (
+              <section className="resumeSkill" key={skill.title}>
+                <h4>{skill.title}</h4>
+                <ul>
+                  {skill.items.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </section>
+            ))}
+            <section className="resumeSkill">
+              <h4>Design-to-Code</h4>
+              <p>Anti Gravity + Claude Code + Codex<br />( i switch between the tools due to credit limits but maintain same repo )</p>
+            </section>
+          </div>
+        </aside>
+      </article>
+    </section>
   );
 }
 
